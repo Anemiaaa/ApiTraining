@@ -1,6 +1,6 @@
 import Foundation
 
-public class Pokemon: Codable {
+public struct Pokemon: Codable {
     
     public let name: String
     
