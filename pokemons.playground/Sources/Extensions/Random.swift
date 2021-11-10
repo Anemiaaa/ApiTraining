@@ -1,15 +1,32 @@
 import Foundation
 
+public enum Result<Value, Error: Swift.Error> {
+    
+    case success(Value)
+    case failure(Error)
+}
+
+public enum randomError: Error {
+    
+    case incorrectInputFormat
+    case urlInit
+}
+
 extension Pokemon {
     
-    public static func random(count: Int, completion: @escaping ([Pokemon]) -> ()) {
-        guard count > 0,
-        let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=\(count)")
-        else { return }
+    public static func random(count: Int, completion: @escaping (Result<[Pokemon], randomError>) -> ()) {
+        guard count > 0 else {
+            completion(.failure(.incorrectInputFormat))
+            return
+        }
+        guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=\(count)") else {
+            completion(.failure(.urlInit))
+            return
+        }
         
-        NetworkHelper.getData(NetworkDataNode<Pokemon>.self, url: url) {
+        NetworkHelper.getData(NetworkDataNode<[Pokemon]>.self, url: url) {
             if let pokemons = $0.results {
-                completion(pokemons)
+                completion(.success(pokemons))
             }
         }
     }
