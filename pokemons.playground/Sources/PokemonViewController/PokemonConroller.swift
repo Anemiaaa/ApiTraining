@@ -1,5 +1,22 @@
 import Foundation
 
+public struct PokemonAbility: Codable {
+    
+    enum CodingKeys: String, CodingKey {
+        
+        case ability
+        case isHidden = "is_hidden"
+    }
+    
+    public let ability: [String: String]
+    public let isHidden: Bool
+}
+
+public struct PokemonAbilities: Codable {
+    
+    public let abilities: [PokemonAbility]
+}
+
 public class PokemonController {
     
     // MARK: -
@@ -19,11 +36,13 @@ public class PokemonController {
     // MARK: -
     // MARK: Public
     
-    public func addPokemons(count: Int) {
+    public func addPokemons(count: Int, completion: @escaping (Result<[Pokemon], randomError>) -> ()) {
         Pokemon.random(count: count) { [weak self] result in
             switch result {
             case .success(let pokemons):
                 self?.pokemons = pokemons.map { Weak(object: $0) }
+                
+                completion(.success(pokemons))
             case .failure(let error):
                 var errorMessage: String
                 
@@ -36,13 +55,22 @@ public class PokemonController {
                     if let view = self?.view {
                         view.display(text: errorMessage)
                     }
+                    completion(.failure(error))
                 }
             }
         }
     }
     
-    public func showPokemonInfo(pokemon: Pokemon, completion: @escaping (Result<>) -> ()) {
+    public func showPokemonInfo(pokemon: Pokemon) {
+        guard let pokemon = self.pokemons.first(where: { $0.object?.id == pokemon.id })?.object else { return }
         
+        NetworkHelper.getData(PokemonAbilities.self, url: pokemon.url) { [weak self] abilities in
+
+            self?.view?.display(text: [
+                "name: " + pokemon.name,
+                "\(abilities.abilities.map { $0 })"
+            ].compactMap { $0 })
+        }
     }
     
 }

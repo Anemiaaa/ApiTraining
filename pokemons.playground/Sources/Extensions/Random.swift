@@ -23,11 +23,9 @@ extension Pokemon {
             completion(.failure(.urlInit))
             return
         }
-        
+
         NetworkHelper.getData(NetworkDataNode<[Pokemon]>.self, url: url) {
-            if let pokemons = $0.results {
-                completion(.success(pokemons))
-            }
+            completion(.success($0.results))
         }
     }
 }

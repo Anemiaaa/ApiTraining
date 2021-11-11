@@ -8,10 +8,16 @@ public struct PokemonInfoNode {
 
 public class Pokemon: Codable {
     
+    enum CodingKeys: String, CodingKey {
+        
+        case name
+        case url
+    }
+    
     // MARK: -
     // MARK: Variables
     
-    public let id: UUID
+    public let id = UUID()
     public let name: String
     public let url: URL
     
@@ -19,7 +25,6 @@ public class Pokemon: Codable {
     // MARK: Initialization
     
     init(name: String, url: URL) {
-        self.id = UUID()
         self.name = name
         self.url = url
     }
