@@ -1,7 +1,7 @@
 import UIKit
 import Foundation
 
-let controller = PokemonController()
+let controller = PokemonController(api: PokemonNetworkAPI())
 let view = PokemonView(controller: controller)
 
 controller.addPokemons(count: 10) { result in

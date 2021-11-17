@@ -1,11 +1,5 @@
 import Foundation
 
-public struct PokemonInfoNode {
-    
-    let abilities: [String : Any]
-    
-}
-
 public class Pokemon: PokemonCodable {
 
     enum CodingKeys: String, CodingKey {

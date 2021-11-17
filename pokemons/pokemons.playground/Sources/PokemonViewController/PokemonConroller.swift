@@ -12,27 +12,30 @@ public class PokemonController {
     // MARK: Variables
     
     public var pokemons: [PokemonCodable] = []
-    
-    //weak var view: PokemonView?
     public var statesHandler = PublishSubject<ControllerStates>()
+    
+    private let api: PokemonAPI
     
     // MARK: -
     // MARK: Initialization
     
-    public init() {}
+    public init(api: PokemonAPI) {
+        self.api = api
+    }
     
     // MARK: -
     // MARK: Public
     
-    public func addPokemons(count: Int, completion: @escaping (Result<[PokemonCodable], randomError>) -> ()) {
-        Pokemon.random(count: count) { [weak self] result in
+    public func addPokemons<DataType: PokemonCodable>(count: Int, dataType: DataType, completion: @escaping (Result<[PokemonCodable], randomError>) -> ()) {
+        self.api.random(count: count, dataType: dataType) { [weak self] result in
             guard let self = self else { return }
             
             switch result {
-            case .success(let pokemons):
-                self.pokemons = pokemons.map { $0 }
+            case .success(let node):
+                self.pokemons = node.results
                 
-                completion(.success(pokemons))
+                completion(.success(self.pokemons))
+                
             case .failure(let error):
                     
                 self.statesHandler.onNext(
