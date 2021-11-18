@@ -1,6 +1,6 @@
 import Foundation
 
-public class Pokemon: PokemonCodable {
+public class Pokemon: Codable {
 
     enum CodingKeys: String, CodingKey {
         

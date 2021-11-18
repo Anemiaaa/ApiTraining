@@ -2,7 +2,7 @@ import Foundation
 
 public protocol PokemonAPI {
     
-    func random<DataType: PokemonCodable>(count: Int, dataType: DataType, completion: @escaping (Result<NetworkDataNode<[DataType]>, randomError>) -> ())
+    func pokemons(count: Int, completion: @escaping (Result<NetworkDataNode<[Pokemon]>, PokemonApiError>) -> ()) 
     
-    func abilities(pokemon: PokemonCodable, completion: @escaping ([PokemonAbility]) -> ())
+    func abilities(pokemon: Pokemon, completion: @escaping (Result<[PokemonAbility], PokemonApiError>) -> ())
 }

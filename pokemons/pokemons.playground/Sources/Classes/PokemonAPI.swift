@@ -1,33 +1,55 @@
 import Foundation
 
+public enum PokemonApiError: Error {
+    
+    case incorrectInputFormat
+    case urlInit
+    case networkError(NetworkError)
+}
+
+
 public class PokemonNetworkAPI: PokemonAPI {
 
+    // MARK: -
+    // MARK: Initialization
+    
     public init() {}
+    
     // MARK: -
     // MARK: Public
     
-    public enum links {
+    public enum Links {
         static let random = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=")
     }
     
-    public func random<DataType: PokemonCodable>(count: Int, dataType: DataType, completion: @escaping (Result<NetworkDataNode<[DataType]>, randomError>) -> ()) {
+    public func pokemons(count: Int, completion: @escaping (Result<NetworkDataNode<[Pokemon]>, PokemonApiError>) -> ()) {
         guard count > 0 else {
             completion(.failure(.incorrectInputFormat))
             return
         }
-        guard let url = links.random?.appendingPathComponent(String(count)) else {
+        guard let url = Links.random?.appendingPathComponent(String(count)) else {
             completion(.failure(.urlInit))
             return
         }
 
-        NetworkHelper.getData(NetworkDataNode<[DataType]>.self, url: url) {
-            completion(.success($0))
+        NetworkHelper.getData(NetworkDataNode<[Pokemon]>.self, url: url) { result in
+            switch result {
+            case .success(let node):
+                completion(.success(node))
+            case .failure(let error):
+                completion(.failure(.networkError(error)))
+            }
         }
     }
     
-    public func abilities(pokemon: PokemonCodable, completion: @escaping ([PokemonAbility]) -> ()) {
-        NetworkHelper.getData(PokemonAbilities.self, url: pokemon.url) { node in
-            completion(node.abilities)
+    public func abilities(pokemon: Pokemon, completion: @escaping (Result<[PokemonAbility], PokemonApiError>) -> ()) {
+        NetworkHelper.getData(PokemonAbilities.self, url: pokemon.url) { result in
+            switch result {
+            case .success(let node):
+                completion(.success(node.abilities))
+            case .failure(let error):
+                completion(.failure(.networkError(error)))
+            }
         }
     }
 }
