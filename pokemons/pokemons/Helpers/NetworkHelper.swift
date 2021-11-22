@@ -18,8 +18,9 @@ public class NetworkHelper {
     
     @discardableResult
     static func getData<DataType: Codable>(_ dataType: DataType.Type, url: URL, completion: @escaping (Result<DataType, NetworkError>) -> ()) -> URLSessionDataTask {
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            
+        let urlSession = URLSession(configuration: .ephemeral)
+        
+        let task = urlSession.dataTask(with: url) { data, response, error in
             if let data = data {
                 do {
                     let decodedJson = try JSONDecoder().decode(DataType.self, from: data)
@@ -45,6 +46,7 @@ public class NetworkHelper {
            
         }
         task.resume()
+
         
         return task
     }

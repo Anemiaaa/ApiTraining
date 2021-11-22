@@ -19,7 +19,7 @@ public class PokemonNetworkAPI: PokemonAPI {
     // MARK: Public
     
     public enum Links {
-        static let random = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=")
+        static let random = "https://pokeapi.co/api/v2/pokemon?limit="
     }
     
     public func pokemons(count: Int, completion: @escaping (Result<NetworkDataNode<[Pokemon]>, PokemonApiError>) -> ()) {
@@ -27,7 +27,7 @@ public class PokemonNetworkAPI: PokemonAPI {
             completion(.failure(.incorrectInputFormat))
             return
         }
-        guard let url = Links.random?.appendingPathComponent(String(count)) else {
+        guard let url = URL(string: Links.random + String(count)) else {
             completion(.failure(.urlInit))
             return
         }

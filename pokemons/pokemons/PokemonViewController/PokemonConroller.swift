@@ -26,15 +26,20 @@ public class PokemonController {
     // MARK: -
     // MARK: Public
     
-    public func addPokemons(count: Int, completion: @escaping (Result<[Pokemon], PokemonApiError>) -> ()) {
+    public func addPokemons(count: Int, completion: (Result<[Pokemon], PokemonApiError>) -> ()) {
+        let group = DispatchGroup()
+        
+        var status: Result<[Pokemon], PokemonApiError>
+        
+        group.enter()
         self.api.pokemons(count: count) { [weak self] result in
             guard let self = self else { return }
             
             switch result {
             case .success(let node):
                 self.pokemons = node.results
-                
-                completion(.success(self.pokemons))
+                status = .success(self.pokemons)
+                group.leave()
                 
             case .failure(let error):
                     
@@ -42,8 +47,12 @@ public class PokemonController {
                     .display(output: [DisplayOutput(data: self.switchApiError(error: error))])
                 )
                                            
-                completion(.failure(error))
+                status = .failure(error)
+                group.leave()
             }
+        }
+        group.notify(queue: .main) {
+            completion(status)
         }
     }
     
